@@ -53,7 +53,6 @@ const Result = ({books,Store}) => {
         </button>
       
       </div>
-      
 
      </div>
      ))}

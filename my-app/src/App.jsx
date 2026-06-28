@@ -5,10 +5,9 @@ import img from './components/public/trybg.png'
 import ApiSetUp from './components/ApiSetup'
 import Result from './components/result'
 import bg from './components/public/bg.png'
-
+import Login from './components/login'
 
 const App = () => {
-  
   //for apis
   const [api,setapi]=useState(false)
   const [input_Key,setinput_Key]=useState('')
@@ -22,14 +21,29 @@ const App = () => {
   //for books
   const[book,setbook]=useState([])
   const[results,setresults]=useState(false)
-
-    useEffect(()=>{
+  const[offline,setOffline]=useState(false)
+  
+  //loged in
+  const[logedin,setlogedin]=useState(true)
+  const[register,setregister]=useState(false)
+  const[email,setemail]=useState('')
+  const[password,setPassword]=useState('')
+  const[token,setToken]=useState('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNDBlMmEzZTlhMGMzMDg2NzMyMDczNyIsInVzZXJuYW1lIjoiQWF5dXNoIiwiaWF0IjoxNzgyNjQ2NzY0LCJleHAiOjE3ODI3MzMxNjR9.ARTE79gpWPojz2Wl329RwQkErCqiQLcAde_sbwNL0DU')
+ 
+  useEffect(()=>{
     if(api_key){
       localStorage.setItem("apiKey",api_key)
     }
 
   },[api_key])
- 
+   
+  useEffect(() => {
+  if(offline){
+    fetch_getBook()
+  }
+}, [offline])  // ← only runs when offline changes, not every render
+
+
 //  const MOODS = [
 //     { id: "Horror", emoji: "😄", label: "Horror", color: "from-yellow-400 to-orange-400", bg: "bg-yellow-50", border: "border-yellow-300" },
 //     { id: "Sci-fy", emoji: "🧸", label: "Sci-fy", color: "from-amber-400 to-brown-400", bg: "bg-amber-50", border: "border-amber-300" },
@@ -55,18 +69,7 @@ const App = () => {
       { id: "romance",      emoji: "❤️", label: "Romance" },
       { id: "Sanatan",      emoji: "🕉️", label: "Sanatan" },
     ]
-   const onsubmit = (e) => {
-    e.preventDefault()
-    if(input_Key){
-      setapi_key(input_Key)
-      setapi(false)
-    }
-  }
-   if(api){
-    return(
-      <ApiSetUp input_Key={input_Key} setinput_Key={setinput_Key} onSubmit={onsubmit}/>
-    )
-   }
+
   const fetchbook=async(moodLabel)=>{
     setbook([])
     setfetching(true)
@@ -89,7 +92,7 @@ try{
   
   const response=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',{
     method:"POST",
-    headers:{"content-Type":"application/json","x-goog-api-key":api_key},
+    headers:{"Content-Type":"application/json","x-goog-api-key":api_key},
     body:JSON.stringify({
       contents:[{parts:[{text:prompt}]}],
       generationConfig:{temperature:0.2,maxOutputTokens:8192}
@@ -99,7 +102,7 @@ try{
     if(!response.ok){
       const err=await response.json();
       console.log(err)
-      throw new Error("smth went wrong",err)
+      setOffline(true)
     }
     //if success
     const data =await response.json()
@@ -110,10 +113,13 @@ try{
     const parsed=JSON.parse(cleaned);
     setbook(parsed)
     setresults(true)
-    setfetching(false)
+
 
 }catch(err){
   console.log(err)
+}
+finally{
+  setfetching(false)
 }
   }
 
@@ -123,16 +129,22 @@ try{
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhM2ZhZDgxYmIyNDY1NjliNWE1OTc0YSIsInVzZXJuYW1lIjoidGVzdHVzZXIiLCJpYXQiOjE3ODI1NTgxMzEsImV4cCI6MTc4MjY0NDUzMX0.7xRb1EpmskfTSTk3e7xrRafK_M2KuSYBdBUM-KwLsTk'  // ← your jwt token
+      "Authorization": `Bearer ${token}`   // ← your jwt token
     },
+   
     body: JSON.stringify({
-      Book_name: book.name,
-      genre: book.genere,
-      description: book.description,
-      stored_by: "testuser",
-      Price: 400,
-      Book_emoji: "📚"
+      name:book.name,
+      genere:book.genere,
+      emoji:book.emoji,
+      description:book.description,
+      difficulty:"Hard",
+      readtime:"4 HRs",
+      topics:["Wont give u the spoilers", "nice bro"],
+      steps:["BUY And read yourself","i dont know"],
+      price:400,
+      Stored_by:"testuser"
     })
+    
   })
 
   const data = await response.json()
@@ -144,25 +156,111 @@ try{
 
   }
 
+const fetchUsers=async(email,password,x)=>{
 
-   const handleCustomMood=(e)=>{
+
+    const response = await fetch(`http://localhost:3000/${x}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      username:email,
+      password:password
+
+    })
+    
+  })
+  if(!response.ok){
+    const err=await response.json();
+    console.log(err)
+    alert('enter valid data')
+    throw new Error("smth went wrong login",err)
+    alert('enter valid data')
+  }  
+
+ const data= await response.json()
+ console.log(data)
+ console.log(data.token)
+ setToken(data.token)
+ setlogedin(true)
+
+}
+
+  const fetch_getBook=async()=>{
+  const response = await fetch(`http://localhost:3000/books`, {
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}`
+
+  },
+  
+})  
+
+  const data=await response.json()
+
+  setbook(data)
+  
+
+  }
+
+  const onsubmit = (e) => {
+    e.preventDefault()
+    if(input_Key){
+      setapi_key(input_Key)
+      setapi(false)
+    }
+  }
+
+  const handleregister=(user,pass)=>{
+  
+   const x='register'
+   fetchUsers(user,pass,x)
+
+  }
+
+  const handlelogin=(user,pass,e)=>{
+    e.preventDefault()
+    const x='login'
+    fetchUsers(user,pass,x)
+ 
+  }
+
+  const handleCustomMood=(e)=>{
     e.preventDefault()
     if(custom_mood){
-     fetchbook(custom_mood)
-   }}
+      fetchbook(custom_mood)
+  }}
 
-
-
-   const handleStore=(book)=>{
+  const handleStore=(book)=>{
     fetchStorebook(book)
-   }
+  }
 
-
-   const handleMood=(mood)=>{
+  const handleMood=(mood)=>{
     fetchbook(mood.label)
-   }
+  }
 
-   if(fetching){
+  if(!logedin){
+    return(
+     <Login email={email} setemail={setemail} password={password} setPassword={setPassword} onClick={handlelogin} handleregister={handleregister} ></Login>
+
+    )
+  }
+
+  if(api){
+    return(
+      <ApiSetUp input_Key={input_Key} setinput_Key={setinput_Key} onSubmit={onsubmit}/>
+    )
+  }
+
+  if(offline){
+    return(
+    <Result books={book} Store={handleStore}></Result>
+    )
+  }
+
+  if(fetching){
     return(
       <div style={{ backgroundImage: `url(${bg})` }} className="bg-cover bg-center min-h-screen overflow-hidden">
         <Navbar api_page={()=>setapi(true)}></Navbar>
@@ -176,17 +274,16 @@ try{
       </div>
       </div>
     )
-   }
+  }
 
-   if(results){
+  if(results){
     return(
     <>
     <Navbar/>
     <Result books={book} Store={handleStore}/>
     </>
     )
-   }
-
+  }
 
   return (
     
