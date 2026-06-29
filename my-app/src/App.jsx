@@ -22,13 +22,16 @@ const App = () => {
   const[book,setbook]=useState([])
   const[results,setresults]=useState(false)
   const[offline,setOffline]=useState(false)
+
+  //local api /offline:
+  const[passMood,setPassMood]=useState('')
   
   //loged in
   const[logedin,setlogedin]=useState(true)
   const[register,setregister]=useState(false)
   const[email,setemail]=useState('')
   const[password,setPassword]=useState('')
-  const[token,setToken]=useState('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNDBlMmEzZTlhMGMzMDg2NzMyMDczNyIsInVzZXJuYW1lIjoiQWF5dXNoIiwiaWF0IjoxNzgyNjQ2NzY0LCJleHAiOjE3ODI3MzMxNjR9.ARTE79gpWPojz2Wl329RwQkErCqiQLcAde_sbwNL0DU')
+  const[token,setToken]=useState('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNDBlMmEzZTlhMGMzMDg2NzMyMDczNyIsInVzZXJuYW1lIjoiQWF5dXNoIiwiaWF0IjoxNzgyNzMzMjY4LCJleHAiOjE3ODI4MTk2Njh9.yTogu_QyQBgcEw42gmpk_A064OU6-nYCF_-tSYYddj0')
  
   useEffect(()=>{
     if(api_key){
@@ -39,7 +42,7 @@ const App = () => {
    
   useEffect(() => {
   if(offline){
-    fetch_getBook()
+    fetch_getBook(passMood)
   }
 }, [offline])  // ← only runs when offline changes, not every render
 
@@ -102,7 +105,9 @@ try{
     if(!response.ok){
       const err=await response.json();
       console.log(err)
+      setPassMood(moodLabel)
       setOffline(true)
+
     }
     //if success
     const data =await response.json()
@@ -187,8 +192,8 @@ const fetchUsers=async(email,password,x)=>{
 
 }
 
-  const fetch_getBook=async()=>{
-  const response = await fetch(`http://localhost:3000/books`, {
+  const fetch_getBook=async(passMood)=>{
+  const response = await fetch(`http://localhost:3000/books/${passMood}`, {
   method: "GET",
   headers: {
     "Content-Type": "application/json",
@@ -197,9 +202,9 @@ const fetchUsers=async(email,password,x)=>{
   },
   
 })  
-
+  
   const data=await response.json()
-
+  console.log(data)
   setbook(data)
   
 
