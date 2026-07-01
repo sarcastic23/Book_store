@@ -31,7 +31,7 @@ const App = () => {
   const[register,setregister]=useState(false)
   const[email,setemail]=useState('')
   const[password,setPassword]=useState('')
-  const[token,setToken]=useState('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNDBlMmEzZTlhMGMzMDg2NzMyMDczNyIsInVzZXJuYW1lIjoiQWF5dXNoIiwiaWF0IjoxNzgyNzMzMjY4LCJleHAiOjE3ODI4MTk2Njh9.yTogu_QyQBgcEw42gmpk_A064OU6-nYCF_-tSYYddj0')
+  const[token,setToken]=useState('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNDBlMmEzZTlhMGMzMDg2NzMyMDczNyIsInVzZXJuYW1lIjoiQWF5dXNoIiwiaWF0IjoxNzgyODMwMDI0LCJleHAiOjE3ODI5MTY0MjR9.TaBn15aaBH_Fp3MeYfSWYeFh60ir7Oluk3iD7OtJMUU')
  
   useEffect(()=>{
     if(api_key){
@@ -74,7 +74,6 @@ const App = () => {
     ]
 
   const fetchbook=async(moodLabel)=>{
-    setbook([])
     setfetching(true)
 try{
     const prompt =`You are a book selector based on genere of book which is  ${moodLabel},rightnow
