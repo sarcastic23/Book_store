@@ -6,6 +6,8 @@ import ApiSetUp from './components/ApiSetup'
 import Result from './components/result'
 import bg from './components/public/bg.png'
 import Login from './components/login'
+import BookCards from './components/BookCards'
+import EsewaForm from './components/esewaForm'
 
 const App = () => {
   //for apis
@@ -22,16 +24,19 @@ const App = () => {
   const[book,setbook]=useState([])
   const[results,setresults]=useState(false)
   const[offline,setOffline]=useState(false)
+  const[bookclick,setbookclick]=useState(false)
+  const[store,setstore]=useState([])
 
   //local api /offline:
   const[passMood,setPassMood]=useState('')
   
   //loged in
-  const[logedin,setlogedin]=useState(true)
+  const[logedin,setlogedin]=useState(false)
   const[register,setregister]=useState(false)
   const[email,setemail]=useState('')
   const[password,setPassword]=useState('')
-  const[token,setToken]=useState('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNDBlMmEzZTlhMGMzMDg2NzMyMDczNyIsInVzZXJuYW1lIjoiQWF5dXNoIiwiaWF0IjoxNzgyODMwMDI0LCJleHAiOjE3ODI5MTY0MjR9.TaBn15aaBH_Fp3MeYfSWYeFh60ir7Oluk3iD7OtJMUU')
+  const[token,setToken]=useState('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNGExYjI1YmIwZWM5NWRmMTEzMGY3ZSIsInVzZXJuYW1lIjoib2trIiwiaWF0IjoxNzgzNTA4MDQyLCJleHAiOjE3ODM1OTQ0NDJ9.AxU9c13Ee7v8BA9qKVc5axSoXXsGVpuWaBoyo-9OYp0')
+
  
   useEffect(()=>{
     if(api_key){
@@ -45,6 +50,14 @@ const App = () => {
     fetch_getBook(passMood)
   }
 }, [offline])  // ← only runs when offline changes, not every render
+
+  useEffect(() => {
+  if(bookclick){
+    
+    fetch_userBook(email)
+
+  }
+}, [bookclick]) 
 
 
 //  const MOODS = [
@@ -141,12 +154,12 @@ finally{
       genere:book.genere,
       emoji:book.emoji,
       description:book.description,
-      difficulty:"Hard",
-      readtime:"4 HRs",
+      difficulty:book.difficulty,
+      readtime:book.readtime,
       topics:["Wont give u the spoilers", "nice bro"],
       steps:["BUY And read yourself","i dont know"],
       price:400,
-      Stored_by:"testuser"
+      Stored_by:email
     })
     
   })
@@ -208,6 +221,33 @@ const fetchUsers=async(email,password,x)=>{
   
 
   }
+
+
+  const fetch_userBook=async(user)=>{
+  const response = await fetch(`http://localhost:3000/books/users/${user}`, {
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}`
+
+  },
+  
+})  
+  
+  const data=await response.json()
+  console.log(data)
+  setstore(data)
+  console.log(store)
+  
+
+  }
+
+
+
+
+
+
+
 
   const onsubmit = (e) => {
     e.preventDefault()
@@ -289,12 +329,18 @@ const fetchUsers=async(email,password,x)=>{
     )
   }
 
+  if(bookclick){
+    return(
+    <BookCards books={store}></BookCards>
+    )
+  }
+
   return (
     
     <div style={{ backgroundImage: `url(${img})` }} className="bg-cover bg-center min-h-screen overflow-hidden">
        {/* <div className='bg-gray-900 min-h-200'>   */}
       <div className='bg-black'>
-         <Navbar api_page={()=>{setapi(true)}}></Navbar>
+         <Navbar api_page={()=>{setapi(true)}} book_click={()=>setbookclick(true)}></Navbar>
       </div>
       <NewCard moods={MOODS} onMoodSelect={handleMood} custom_mood={custom_mood} setcustom_mood={setcustom_mood} handleCustomMood={handleCustomMood}></NewCard>
     </div>

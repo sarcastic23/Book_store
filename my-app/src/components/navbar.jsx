@@ -3,7 +3,7 @@ import homeIcon from './public/icon.jpg'
 import Keyimg from './public/key.jpg'
 
 
-const Navbar = ({api_page}) => {
+const Navbar = ({api_page,book_click}) => {
   return (
     <div className='flex min-w-screen bg-black'>
      <div>
@@ -19,7 +19,9 @@ const Navbar = ({api_page}) => {
          '>
 
         <h1 className='hover:scale-100 hover:text-green-300 hover:font-bebas transition-all duration-200 cursor-pointer'>login</h1>
+        <button onClick={book_click}>
         <h1 className='hover:scale-100 hover:text-green-300 hover:font-bebas  transition-all duration-200 cursor-pointer'>Book</h1>
+        </button>
         <button onClick={api_page}>
         <h1 className='hover:scale-100 hover:text-green-300 hover:font-bebas transition-all duration-200 cursor-pointer'>kEY!</h1>
         </button>
