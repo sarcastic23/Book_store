@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken')
 const userRouter=express.Router()
 
 const {User}=require('../database')
-const your_secret_key="khdcbkjasbkhasbk";
+const your_secret_key=process.env.JWT_SECRET;
 
 userRouter.post("/register", async (req,res)=>{
 try{
