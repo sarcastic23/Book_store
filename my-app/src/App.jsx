@@ -10,6 +10,7 @@ import BookCards from './components/BookCards'
 import EsewaForm from './components/esewaForm'
 
 const App = () => {
+  const API_URL = import.meta.env.VITE_API_URL;
   //for apis
   const [api,setapi]=useState(false)
   const [input_Key,setinput_Key]=useState('')
@@ -142,7 +143,7 @@ finally{
 
   const fetchStorebook=async(book)=>{
 
-  const response = await fetch('http://localhost:3000/books', {
+  const response = await fetch(`${API_URL}/books`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -176,7 +177,7 @@ finally{
 const fetchUsers=async(email,password,x)=>{
 
 
-    const response = await fetch(`http://localhost:3000/${x}`, {
+    const response = await fetch(`${API_URL}/${x}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -205,7 +206,7 @@ const fetchUsers=async(email,password,x)=>{
 }
 
   const fetch_getBook=async(passMood)=>{
-  const response = await fetch(`http://localhost:3000/books/${passMood}`, {
+  const response = await fetch(`${API_URL}/books/${passMood}`, {
   method: "GET",
   headers: {
     "Content-Type": "application/json",
@@ -224,7 +225,7 @@ const fetchUsers=async(email,password,x)=>{
 
 
   const fetch_userBook=async(user)=>{
-  const response = await fetch(`http://localhost:3000/books/users/${user}`, {
+  const response = await fetch(`${API_URL}/books/users/${user}`, {
   method: "GET",
   headers: {
     "Content-Type": "application/json",
